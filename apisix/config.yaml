@@ -75,6 +75,13 @@ deployment:
     # app on another origin.
     enable_admin_cors: ${{APISIX_ADMIN_CORS:=false}}
     enable_admin_ui: true
+    # The default is 127.0.0.0/24, which 403s the admin proxy. Railway gives every
+    # container a ULA address out of fd00::/8 and private networking is scoped to
+    # one project and environment, so this admits this project's own services and
+    # nothing else. The admin key is still what authenticates every request.
+    allow_admin:
+      - 127.0.0.0/24
+      - "fd00::/8"
     # `[::]` and not `0.0.0.0`: APISIX renders this as a single nginx `listen`
     # directive with no IPv6 twin (unlike node_listen, which it duplicates when
     # enable_ipv6 is set), and Railway's private network routes IPv6 between
