@@ -18,7 +18,9 @@
 
 	# The Admin API server has no handler at /, so send visitors to the dashboard.
 	handle / {
-		redir /ui/ 302
+		# The `*` matcher is required: redir reads a leading-slash first argument
+		# as a matcher, so `redir /ui/ 302` would silently answer an empty 200.
+		redir * /ui/ 302
 	}
 
 	handle {

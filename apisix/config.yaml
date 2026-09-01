@@ -75,13 +75,15 @@ deployment:
     # app on another origin.
     enable_admin_cors: ${{APISIX_ADMIN_CORS:=false}}
     enable_admin_ui: true
-    # The default is 127.0.0.0/24, which 403s the admin proxy. Railway gives every
-    # container a ULA address out of fd00::/8 and private networking is scoped to
-    # one project and environment, so this admits this project's own services and
-    # nothing else. The admin key is still what authenticates every request.
+    # The default 127.0.0.0/24 403s every request. An IP allow-list cannot be the
+    # control here for two reasons: the listener is private and reached only
+    # through the admin proxy, and nginx's realip module rewrites $remote_addr
+    # from X-Real-IP before the access module runs, so what this list is compared
+    # against is the browser's own address. The admin key authenticates every
+    # request; restrict the admin origin at the proxy if you want more.
     allow_admin:
-      - 127.0.0.0/24
-      - "fd00::/8"
+      - 0.0.0.0/0
+      - "::/0"
     # `[::]` and not `0.0.0.0`: APISIX renders this as a single nginx `listen`
     # directive with no IPv6 twin (unlike node_listen, which it duplicates when
     # enable_ipv6 is set), and Railway's private network routes IPv6 between
