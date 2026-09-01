@@ -75,8 +75,13 @@ deployment:
     # app on another origin.
     enable_admin_cors: ${{APISIX_ADMIN_CORS:=false}}
     enable_admin_ui: true
+    # `::` and not `0.0.0.0`: APISIX renders this as a single nginx `listen`
+    # directive with no IPv6 twin (unlike node_listen, which it duplicates when
+    # enable_ipv6 is set), and Railway's private network routes IPv6 between
+    # services. On 0.0.0.0 the admin proxy cannot reach this port at all.
+    # Nothing on IPv4 needs it: the health-check prober uses the status port.
     admin_listen:
-      ip: 0.0.0.0
+      ip: "::"
       port: 9180
     admin_api_version: v3
 
