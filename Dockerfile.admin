@@ -1,0 +1,10 @@
+# Reverse proxy publishing the APISIX Admin API and its embedded dashboard.
+#
+# Railway's edge has no path-based routing and names one public host per service,
+# so the gateway's traffic port and the admin port cannot share one domain. This
+# service owns the second origin; the gateway itself stays on 9080.
+FROM caddy:2-alpine
+
+COPY admin/Caddyfile /etc/caddy/Caddyfile
+
+RUN caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
